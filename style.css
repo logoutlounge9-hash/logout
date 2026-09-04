@@ -1,0 +1,284 @@
+/* ============================================================
+   TOKENS
+   Swap these six values and the whole site re-skins.
+   ============================================================ */
+:root{
+  --night:    #131A2A;   /* page ground — deep slate blue, late evening */
+  --panel:    #1B2437;   /* raised surfaces */
+  --line:     #27324A;   /* borders, rules */
+  --sodium:   #FFB23F;   /* primary accent — streetlamp amber */
+  --live:     #6FE3B0;   /* status only: online / live now */
+  --chalk:    #EDEFF5;   /* primary text */
+  --dim:      #8994AC;   /* secondary text */
+
+  --display: 'Archivo', 'Arial Black', system-ui, sans-serif;
+  --body:    'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --r: 4px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{
+  background:var(--night);
+  color:var(--chalk);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--sodium);outline-offset:3px;border-radius:2px}
+
+.wrap{width:min(1120px, 100% - 40px);margin-inline:auto}
+.section{padding:clamp(56px,8vw,104px) 0;border-top:1px solid var(--line)}
+
+/* Shared type roles ---------------------------------------- */
+.eyebrow{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+}
+.h2{
+  font-family:var(--display);font-weight:800;font-stretch:118%;
+  font-size:clamp(28px,4.4vw,46px);line-height:.98;
+  letter-spacing:-.01em;text-transform:uppercase;
+}
+.lede{color:var(--dim);max-width:56ch;margin-top:14px}
+.head{margin-bottom:34px}
+.head .h2{margin-top:10px}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(19,26,42,.86);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{display:flex;align-items:center;gap:24px;height:60px}
+.brand{
+  font-family:var(--display);font-weight:900;font-stretch:120%;
+  font-size:16px;letter-spacing:.02em;text-transform:uppercase;
+  display:flex;align-items:center;gap:9px;flex:none;
+}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--live);flex:none}
+.nav-links{
+  display:flex;gap:22px;margin-left:auto;
+  overflow-x:auto;scrollbar-width:none;
+  font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--dim);
+}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{white-space:nowrap;padding:4px 0;border-bottom:1px solid transparent;transition:color .15s,border-color .15s}
+.nav-links a:hover{color:var(--chalk);border-color:var(--sodium)}
+
+.btn{
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;
+  background:var(--sodium);color:#12172A;
+  padding:11px 18px;border:0;border-radius:var(--r);
+  cursor:pointer;flex:none;transition:transform .12s, filter .15s;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(1px)}
+.nav .btn{padding:9px 15px}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{padding:clamp(48px,7vw,84px) 0 clamp(40px,6vw,72px)}
+.hero h1{
+  font-family:var(--display);font-weight:900;font-stretch:125%;
+  font-size:clamp(46px,10.5vw,116px);line-height:.86;
+  letter-spacing:-.025em;text-transform:uppercase;margin:16px 0 0;
+}
+.hero h1 em{font-style:normal;color:var(--sodium)}
+.hero p{color:var(--dim);max-width:50ch;margin-top:20px;font-size:17px}
+.hero-cta{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+.cta-note{
+  font-family:var(--mono);font-size:12px;color:var(--dim);
+  margin-top:14px;letter-spacing:.02em;
+}
+.cta-note a{color:var(--sodium);border-bottom:1px solid transparent;transition:border-color .15s}
+.cta-note a:hover{border-color:var(--sodium)}
+.clock{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.clock b{color:var(--live);font-weight:500}
+
+/* ============================================================
+   GAMES
+   ============================================================ */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+.chip{
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  background:transparent;color:var(--dim);border:1px solid var(--line);
+  padding:8px 14px;border-radius:20px;cursor:pointer;transition:.15s;
+}
+.chip:hover{color:var(--chalk);border-color:var(--dim)}
+.chip[aria-pressed="true"]{background:var(--chalk);color:var(--night);border-color:var(--chalk)}
+
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.game{
+  border:1px solid var(--line);border-radius:var(--r);padding:20px;
+  background:var(--panel);transition:border-color .18s, transform .18s;
+}
+.game:hover{border-color:var(--sodium);transform:translateY(-2px)}
+.game[hidden]{display:none}
+.game h3{font-size:17px;font-weight:600;margin-bottom:6px}
+.game p{color:var(--dim);font-size:14px;line-height:1.5}
+.game .meta{
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--sodium);margin-bottom:12px;
+}
+
+/* ============================================================
+   THE WEEK — timetable
+   ============================================================ */
+.week{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.day{border-right:1px solid var(--line);min-height:190px;background:var(--panel)}
+.day:last-child{border-right:0}
+.day-h{
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  padding:11px 12px;border-bottom:1px solid var(--line);color:var(--dim);
+}
+.day.today{background:#202B44}
+.day.today .day-h{color:var(--sodium)}
+.slot{padding:11px 12px;border-bottom:1px solid var(--line)}
+.slot:last-child{border-bottom:0}
+.slot b{display:block;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--chalk)}
+.slot span{font-size:13px;color:var(--dim);line-height:1.35;display:block;margin-top:3px}
+.rest{padding:11px 12px;font-size:13px;color:#5C6683;font-style:italic}
+
+/* Veiled state — real content behind, teaser in front.
+   Wrap anything in .veiled + add a .veil sibling to use it. */
+.veiled{position:relative}
+.veiled > :not(.veil){filter:blur(7px);opacity:.5;pointer-events:none;user-select:none}
+.veil{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+.veil span{
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--sodium);
+  border:1px solid var(--sodium);border-radius:24px;padding:13px 24px;
+  background:rgba(19,26,42,.78);text-align:center;
+}
+
+/* ============================================================
+   LADDER
+   ============================================================ */
+.ladder{width:100%;border-collapse:collapse;font-size:15px}
+.ladder th{
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--dim);text-align:left;
+  padding:0 14px 12px;border-bottom:1px solid var(--line);
+}
+.ladder td{padding:15px 14px;border-bottom:1px solid var(--line)}
+.ladder tr:last-child td{border-bottom:0}
+.ladder .num,.ladder .pts{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.ladder .num{color:var(--dim);font-size:13px;width:44px}
+.ladder .pts{text-align:right;font-weight:700}
+.ladder .who{font-weight:600}
+.ladder .who small{display:block;color:var(--dim);font-weight:400;font-size:13px;font-family:var(--mono)}
+.ladder tr:first-child .pts{color:var(--sodium)}
+.streak{font-family:var(--mono);font-size:12px;color:var(--live)}
+
+/* ============================================================
+   JOIN
+   ============================================================ */
+.join-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,64px);align-items:start}
+.field{margin-bottom:18px}
+.field label{
+  display:block;font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:8px;
+}
+.field input,.field select{
+  width:100%;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--chalk);font-family:var(--body);font-size:15px;padding:13px 14px;
+  transition:border-color .15s;
+}
+.field input::placeholder{color:#5C6683}
+.field input:focus,.field select:focus{border-color:var(--sodium);outline:none}
+.field .err{display:none;color:#FF9A8B;font-size:13px;margin-top:7px}
+.field.bad input{border-color:#FF9A8B}
+.field.bad .err{display:block}
+.nights{display:flex;gap:7px;flex-wrap:wrap}
+.nights input{position:absolute;opacity:0;width:0;height:0}
+.nights label{
+  margin:0;cursor:pointer;padding:9px 13px;border:1px solid var(--line);border-radius:20px;
+  transition:.15s;
+}
+.nights input:checked + label{background:var(--chalk);color:var(--night);border-color:var(--chalk)}
+.nights input:focus-visible + label{outline:2px solid var(--sodium);outline-offset:2px}
+.note{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:14px;line-height:1.7}
+.ok{
+  display:none;border:1px solid var(--live);border-radius:var(--r);
+  padding:18px;color:var(--live);font-size:15px;
+}
+.ok.show{display:block}
+form.sent{display:none}
+
+/* ============================================================
+   VERIFICATION GATE
+   ============================================================ */
+.gate{
+  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(9,13,22,.82);backdrop-filter:blur(4px);
+}
+.gate[hidden]{display:none}
+.gate-box{
+  position:relative;width:min(420px,100%);
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:28px;
+}
+.gate-x{
+  position:absolute;top:12px;right:14px;background:none;border:0;cursor:pointer;
+  color:var(--dim);font-size:24px;line-height:1;padding:4px 8px;
+}
+.gate-x:hover{color:var(--chalk)}
+.gate-box h3{
+  font-family:var(--display);font-weight:800;font-stretch:112%;text-transform:uppercase;
+  font-size:24px;line-height:1;margin:10px 0 12px;
+}
+.gate-copy{color:var(--dim);font-size:14px;line-height:1.55;margin-bottom:20px}
+#gate-widget{min-height:65px}
+.gate-status{
+  font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:14px;line-height:1.6;
+}
+.gate-status.bad{color:#FF9A8B}
+#gate-go{display:block;width:100%;text-align:center;margin-top:16px;padding:14px}
+
+details{border-bottom:1px solid var(--line)}
+details summary{
+  cursor:pointer;list-style:none;padding:18px 0;font-weight:600;font-size:16px;
+  display:flex;justify-content:space-between;gap:20px;align-items:center;
+}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";font-family:var(--mono);color:var(--sodium);font-size:19px}
+details[open] summary::after{content:"−"}
+details p{color:var(--dim);padding-bottom:18px;font-size:15px;max-width:60ch}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{border-top:1px solid var(--line);padding:40px 0;
+  font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.04em}
+.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.foot a:hover{color:var(--sodium)}
+.foot nav{display:flex;gap:20px;flex-wrap:wrap}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:860px){
+  .join-grid{grid-template-columns:1fr}
+  .week{grid-template-columns:1fr}
+  .day{border-right:0;border-bottom:1px solid var(--line);min-height:0}
+  .day:last-child{border-bottom:0}
+}
+@media (max-width:640px){
+  .nav-inner{gap:14px}
+  .nav-links{gap:16px;font-size:11px}
+  .ladder .streak-col{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}

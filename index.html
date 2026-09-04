@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logout Lounge - Log Off. Team Up. Game On.</title>
+<meta name="description" content="Log off. Team up. Game on. An online gaming club that meets most evenings. Free to join, no tryouts, Discord-first.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileReady&render=explicit" async defer></script>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="brand"><span class="dot"></span>Logout&nbsp;Lounge</a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#games">Games</a>
+      <a href="#week">The week</a>
+      <a href="#ladder">Ladder</a>
+    </nav>
+    <a href="#join" class="btn" id="cta-nav">Join the club</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO ------------------------------------------------- -->
+  <section class="wrap hero">
+    <p class="clock"><span id="clock">—</span> · <b id="online">—</b> online<span id="voice"></span></p>
+    <h1>We queue<br>at nine.<br><em>Every night.</em></h1>
+    <p>Clock off and drop in. Same faces most evenings, no tryouts, no rank floor, nothing to pay. Play when you can, sit it out when you can't.</p>
+    <div class="hero-cta">
+      <a href="#join" class="btn" id="cta-hero">Join the club</a>
+    </div>
+    <p class="cta-note" id="cta-note"></p>
+  </section>
+
+  <!-- GAMES ------------------------------------------------ -->
+  <section class="section" id="games">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">What we play</p>
+        <h2 class="h2">Eight games, one lobby</h2>
+        <p class="lede">Competitive nights run with fixed rosters and comms. Casual and party nights are open to anyone in the server — drop in halfway through if that's all the time you have.</p>
+      </div>
+
+      <div class="chips" role="group" aria-label="Filter games by type">
+        <button class="chip" data-filter="all" aria-pressed="true">All</button>
+        <button class="chip" data-filter="comp" aria-pressed="false">Competitive</button>
+        <button class="chip" data-filter="casual" aria-pressed="false">Casual</button>
+        <button class="chip" data-filter="party" aria-pressed="false">Party</button>
+      </div>
+
+      <div class="games" id="games-grid"></div>
+    </div>
+  </section>
+
+  <!-- WEEK ------------------------------------------------- -->
+  <section class="section" id="week">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">The week</p>
+        <h2 class="h2">Same nights, same times</h2>
+        <p class="lede">The schedule doesn't move. That's the whole trick — nobody has to organise anything, you just know that Thursday is ranked night. All times IST.</p>
+      </div>
+      <div class="veiled">
+        <div class="week" id="week-grid" aria-hidden="true"></div>
+        <div class="veil"><span>Coming soon</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LADDER ----------------------------------------------- -->
+  <section class="section" id="ladder">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">August ladder</p>
+        <h2 class="h2">Points for turning up</h2>
+        <p class="lede">Three points for a session attended, two for a win, one for bringing someone new. It resets on the first of the month. It's mostly an excuse for bragging in the server.</p>
+      </div>
+      <div class="veiled">
+        <table class="ladder" aria-hidden="true">
+          <thead>
+            <tr>
+              <th>#</th><th>Member</th><th>Main</th>
+              <th class="streak-col">Streak</th><th style="text-align:right">Pts</th>
+            </tr>
+          </thead>
+          <tbody id="ladder-body"></tbody>
+        </table>
+        <div class="veil"><span>Coming soon</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOIN ------------------------------------------------- -->
+  <section class="section" id="join">
+    <div class="wrap join-grid">
+      <div>
+        <p class="eyebrow">Join</p>
+        <h2 class="h2" id="join-title" style="margin-top:10px">Takes about<br>forty seconds</h2>
+        <p class="lede" id="join-lede"></p>
+        <p class="note">
+          Free, forever.<br>
+          No rank requirement.<br>
+          Leave whenever, no hard feelings.<br>
+          16+, and read the rules before you post.
+        </p>
+      </div>
+
+      <div>
+        <form id="join-form" novalidate>
+          <div class="field" id="f-name">
+            <label for="name">Your name or handle</label>
+            <input id="name" name="name" type="text" placeholder="e.g. Aarav, or bunnyhop_99" autocomplete="nickname">
+            <p class="err">Add a name so we know who to greet.</p>
+          </div>
+
+          <div class="field" id="f-discord">
+            <label for="discord">Discord username</label>
+            <input id="discord" name="discord" type="text" placeholder="e.g. bunnyhop99" autocomplete="off">
+            <p class="err">Add your Discord username — that's where the invite goes.</p>
+          </div>
+
+          <div class="field">
+            <label for="main">Game you'd play most</label>
+            <select id="main" name="main">
+              <option>Valorant</option>
+              <option>Rocket League</option>
+              <option>Counter-Strike 2</option>
+              <option>Apex Legends</option>
+              <option>Minecraft</option>
+              <option>Chess</option>
+              <option>Whatever's on</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Nights you can usually make</label>
+            <div class="nights">
+              <input type="checkbox" id="d1" name="nights" value="Mon"><label for="d1">Mon</label>
+              <input type="checkbox" id="d2" name="nights" value="Tue"><label for="d2">Tue</label>
+              <input type="checkbox" id="d3" name="nights" value="Wed"><label for="d3">Wed</label>
+              <input type="checkbox" id="d4" name="nights" value="Thu"><label for="d4">Thu</label>
+              <input type="checkbox" id="d5" name="nights" value="Fri"><label for="d5">Fri</label>
+              <input type="checkbox" id="d6" name="nights" value="Sat"><label for="d6">Sat</label>
+              <input type="checkbox" id="d7" name="nights" value="Sun"><label for="d7">Sun</label>
+            </div>
+          </div>
+
+          <button class="btn" type="submit" id="join-submit" style="width:100%;padding:15px">Send request</button>
+        </form>
+
+        <div class="ok" id="join-ok">
+          <strong>You're on the list.</strong><br>
+          We open a new batch of 20 whenever there's room. We'll send you a friend request on Discord when the next one opens — keep an eye out for it.<span id="ok-position"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -------------------------------------------------- -->
+  <section class="section">
+    <div class="wrap" style="max-width:760px">
+      <div class="head"><p class="eyebrow">Before you ask</p><h2 class="h2">Questions</h2></div>
+
+      <details>
+        <summary>Do I need to be any good?</summary>
+        <p>No. Competitive nights get split into two lobbies by rank so games stay close, and casual nights don't sort at all. Roughly half the club has never played ranked.</p>
+      </details>
+      <details>
+        <summary>What if I can only make one night a week?</summary>
+        <p>That's most people. The schedule is fixed precisely so you can pick the one night that works and ignore the rest. There's no attendance minimum.</p>
+      </details>
+      <details>
+        <summary>Do I have to talk on voice?</summary>
+        <p>Only on scrim nights, where callouts matter. Everything else runs fine with text — plenty of members sit muted in the voice channel and type.</p>
+      </details>
+      <details>
+        <summary>What does it cost?</summary>
+        <p>Nothing. Tournament entry fees, when we run one, get split between whoever's playing and are announced two weeks ahead.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© 2026 Logout Lounge · Est. 2023 · 84 members</span>
+    <nav>
+      <a href="#games">Games</a>
+      <a href="#week">Schedule</a>
+      <a href="#ladder">Ladder</a>
+      <a href="#join">Join</a>
+      <a href="#">Rules</a>
+      <a href="#">Discord</a>
+    </nav>
+  </div>
+</footer>
+
+<div class="gate" id="gate" hidden>
+  <div class="gate-box" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+    <button class="gate-x" id="gate-close" aria-label="Close">&times;</button>
+    <p class="eyebrow">One quick check</p>
+    <h3 id="gate-title">Are you a person?</h3>
+    <p class="gate-copy">The invite isn't printed on this page — it's handed over after this check, so scrapers have nothing to find.</p>
+    <div id="gate-widget"></div>
+    <p class="gate-status" id="gate-status">Waiting for the check&hellip;</p>
+    <a class="btn" id="gate-go" hidden target="_blank" rel="noopener">Open Discord</a>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
