@@ -4,212 +4,215 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Logout Lounge - Log Off. Team Up. Game On.</title>
-<meta name="description" content="Log off. Team up. Game on. An online gaming club that meets most evenings. Free to join, no tryouts, Discord-first.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="description" content="A community for people who work days and want a quiet night. Co-op and low-stakes games with strangers on the same schedule.">
 <link rel="stylesheet" href="style.css">
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileReady&render=explicit" async defer></script>
 </head>
 <body>
 
-<header class="nav">
-  <div class="wrap nav-inner">
-    <a href="#top" class="brand"><span class="dot"></span>Logout&nbsp;Lounge</a>
-    <nav class="nav-links" aria-label="Sections">
-      <a href="#games">Games</a>
-      <a href="#week">The week</a>
-      <a href="#ladder">Ladder</a>
-    </nav>
-    <a href="#join" class="btn" id="cta-nav">Join the club</a>
-  </div>
-</header>
-
-<main id="top">
-
-  <!-- HERO --->
-  <section class="wrap hero">
-    <p class="clock"><span id="clock">—</span> · <b id="online">—</b> online<span id="voice"></span></p>
-    <h1>We queue<br>at nine.<br><em>Every night.</em></h1>
-    <p>Clock off and drop in. Same faces most evenings, no tryouts, no rank floor, nothing to pay. Play when you can, sit it out when you can't.</p>
-    <div class="hero-cta">
-      <a href="#join" class="btn" id="cta-hero">Join the club</a>
-    </div>
-    <p class="cta-note" id="cta-note"></p>
-  </section>
-
-  <!-- GAMES ----->
-  <section class="section" id="games">
-    <div class="wrap">
-      <div class="head">
-        <p class="eyebrow">What we play</p>
-        <h2 class="h2">Eight games, one lobby</h2>
-        <p class="lede">Competitive nights run with fixed rosters and comms. Casual and party nights are open to anyone in the server — drop in halfway through if that's all the time you have.</p>
-      </div>
-
-      <div class="chips" role="group" aria-label="Filter games by type">
-        <button class="chip" data-filter="all" aria-pressed="true">All</button>
-        <button class="chip" data-filter="comp" aria-pressed="false">Competitive</button>
-        <button class="chip" data-filter="casual" aria-pressed="false">Casual</button>
-        <button class="chip" data-filter="party" aria-pressed="false">Party</button>
-      </div>
-
-      <div class="games" id="games-grid"></div>
-    </div>
-  </section>
-
-  <!-- WEEK ----------->
-  <section class="section" id="week">
-    <div class="wrap">
-      <div class="head">
-        <p class="eyebrow">The week</p>
-        <h2 class="h2">Same nights, same times</h2>
-        <p class="lede">The schedule doesn't move. That's the whole trick — nobody has to organise anything, you just know that Thursday is ranked night. All times IST.</p>
-      </div>
-      <div class="veiled">
-        <div class="week" id="week-grid" aria-hidden="true"></div>
-        <div class="veil"><span>Coming soon</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- LADDER -------->
-  <section class="section" id="ladder">
-    <div class="wrap">
-      <div class="head">
-        <p class="eyebrow">August ladder</p>
-        <h2 class="h2">Points for turning up</h2>
-        <p class="lede">Three points for a session attended, two for a win, one for bringing someone new. It resets on the first of the month. It's mostly an excuse for bragging in the server.</p>
-      </div>
-      <div class="veiled">
-        <table class="ladder" aria-hidden="true">
-          <thead>
-            <tr>
-              <th>#</th><th>Member</th><th>Main</th>
-              <th class="streak-col">Streak</th><th style="text-align:right">Pts</th>
-            </tr>
-          </thead>
-          <tbody id="ladder-body"></tbody>
-        </table>
-        <div class="veil"><span>Coming soon</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- JOIN --------->
-  <section class="section" id="join">
-    <div class="wrap join-grid">
-      <div>
-        <p class="eyebrow">Join</p>
-        <h2 class="h2" id="join-title" style="margin-top:10px">Takes about<br>forty seconds</h2>
-        <p class="lede" id="join-lede"></p>
-        <p class="note">
-          Free, forever.<br>
-          No rank requirement.<br>
-          Leave whenever, no hard feelings.<br>
-          16+, and read the rules before you post.
-        </p>
-      </div>
-
-      <div>
-        <form id="join-form" novalidate>
-          <div class="field" id="f-name">
-            <label for="name">Your name or handle</label>
-            <input id="name" name="name" type="text" placeholder="e.g. Aarav, or bunnyhop_99" autocomplete="nickname">
-            <p class="err">Add a name so we know who to greet.</p>
-          </div>
-
-          <div class="field" id="f-discord">
-            <label for="discord">Discord username</label>
-            <input id="discord" name="discord" type="text" placeholder="e.g. bunnyhop99" autocomplete="off">
-            <p class="err">Add your Discord username — that's where the invite goes.</p>
-          </div>
-
-          <div class="field">
-            <label for="main">Game you'd play most</label>
-            <select id="main" name="main">
-              <option>Valorant</option>
-              <option>Rocket League</option>
-              <option>Counter-Strike 2</option>
-              <option>Apex Legends</option>
-              <option>Minecraft</option>
-              <option>Chess</option>
-              <option>Whatever's on</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Nights you can usually make</label>
-            <div class="nights">
-              <input type="checkbox" id="d1" name="nights" value="Mon"><label for="d1">Mon</label>
-              <input type="checkbox" id="d2" name="nights" value="Tue"><label for="d2">Tue</label>
-              <input type="checkbox" id="d3" name="nights" value="Wed"><label for="d3">Wed</label>
-              <input type="checkbox" id="d4" name="nights" value="Thu"><label for="d4">Thu</label>
-              <input type="checkbox" id="d5" name="nights" value="Fri"><label for="d5">Fri</label>
-              <input type="checkbox" id="d6" name="nights" value="Sat"><label for="d6">Sat</label>
-              <input type="checkbox" id="d7" name="nights" value="Sun"><label for="d7">Sun</label>
-            </div>
-          </div>
-
-          <button class="btn" type="submit" id="join-submit" style="width:100%;padding:15px">Send request</button>
-        </form>
-
-        <div class="ok" id="join-ok">
-          <strong>You're on the list.</strong><br>
-          We open a new batch of 20 whenever there's room. We'll send you a friend request on Discord when the next one opens — keep an eye out for it.<span id="ok-position"></span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ ----->
-  <section class="section">
-    <div class="wrap" style="max-width:760px">
-      <div class="head"><p class="eyebrow">Before you ask</p><h2 class="h2">Questions</h2></div>
-
-      <details>
-        <summary>Do I need to be any good?</summary>
-        <p>No. Competitive nights get split into two lobbies by rank so games stay close, and casual nights don't sort at all. Roughly half the club has never played ranked.</p>
-      </details>
-      <details>
-        <summary>What if I can only make one night a week?</summary>
-        <p>That's most people. The schedule is fixed precisely so you can pick the one night that works and ignore the rest. There's no attendance minimum.</p>
-      </details>
-      <details>
-        <summary>Do I have to talk on voice?</summary>
-        <p>Only on scrim nights, where callouts matter. Everything else runs fine with text — plenty of members sit muted in the voice channel and type.</p>
-      </details>
-      <details>
-        <summary>What does it cost?</summary>
-        <p>Nothing. Tournament entry fees, when we run one, get split between whoever's playing and are announced two weeks ahead.</p>
-      </details>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div class="wrap foot">
-    <span>© 2026 Logout Lounge · Est. 2023 · 84 members</span>
-    <nav>
-      <a href="#games">Games</a>
-      <a href="#week">Schedule</a>
-      <a href="#ladder">Ladder</a>
-      <a href="#join">Join</a>
-      <a href="#">Rules</a>
-      <a href="#">Discord</a>
-    </nav>
-  </div>
+<div class="site-div">
+<!-- hero: the one steel field -->
+<div class="site-div-2">
+<nav class="site-nav">
+<span class="site-span">Logout Lounge</span>
+<span class="site-span-2"></span>
+<a class="site-a" href="#games">Games</a>
+<a class="site-a" href="#board">Leaderboard</a>
+<a class="site-a" href="#rules">House rules</a>
+<a class="site-a" href="#discord">Discord</a>
+<a class="site-a-2" href="#waitlist" data-waitlist>Join the waitlist</a>
+</nav>
+<div class="site-div-3">
+<span class="site-span-3">Lobbies open 20:00 — 01:00, every night</span>
+<h1 class="site-h1">
+<span class="site-span-4">Clock out.</span>
+<span class="site-span-4">Log in.</span>
+<span class="site-span-5">Play slow.</span>
+</h1>
+<p class="site-p">A community for people who work days and want a quiet night. Co-op and low-stakes games with strangers on the same schedule. No ranked ladders, no voice required, no one asking you to grind.</p>
+<div class="site-div-4">
+<a class="site-a-3" href="#waitlist" data-waitlist>Get on the list</a>
+<a class="site-a-4" href="#discord" data-discord>Open Discord</a>
+</div>
+</div>
+</div>
+<!-- the rotation ticker -->
+<div class="site-div-5">
+<div class="ll-ticker-track site-div-6">
+<div class="site-div-7">
+<span>Stardew Valley</span><span>·</span><span>Overcooked 2</span><span>·</span><span>Deep Rock Galactic</span><span>·</span><span>Dorfromantik</span><span>·</span><span>Unrailed</span><span>·</span><span>PowerWash Simulator</span><span>·</span><span>Slay the Spire</span><span>·</span>
+</div>
+<div aria-hidden="true" class="site-div-7">
+<span>Stardew Valley</span><span>·</span><span>Overcooked 2</span><span>·</span><span>Deep Rock Galactic</span><span>·</span><span>Dorfromantik</span><span>·</span><span>Unrailed</span><span>·</span><span>PowerWash Simulator</span><span>·</span><span>Slay the Spire</span><span>·</span>
+</div>
+</div>
+</div>
+<div class="site-div-8">
+<!-- the three counts -->
+<section class="site-section">
+<div>
+<span class="ll-flicker site-span-6" id="stat-waitlist">1,204</span>
+<p class="site-p-2">people on the waitlist, most of them on the 9-to-6</p>
+</div>
+<div>
+<span class="ll-flicker site-span-7" id="stat-nights">142</span>
+<p class="site-p-2">nights logged by <span id="stat-top">quietfern</span>, top of the board</p>
+</div>
+<div>
+<span class="ll-flicker site-span-8">0</span>
+<p class="site-p-2">ranked ladders, ever</p>
+</div>
+</section>
+<!-- house rules plate -->
+<section class="site-section-2" id="rules">
+<span class="rules-span">01 · House rules</span>
+<hr class="rules-hr"/>
+<div class="blueprint">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div class="rules-div">
+<span class="rules-span-2">Logout Lounge — house rules</span>
+<span class="rules-span-3">Rev A</span>
+<span class="rules-span-3">Sheet 01 of 01</span>
+</div>
+<table class="table rules-table">
+<tbody>
+<tr><td class="rules-td">01</td><td class="rules-td-2">Doors</td><td class="rules-td-3">20:00 — 01:00</td><td class="rules-td-4">Local time, seven nights</td></tr>
+<tr><td class="rules-td-5">02</td><td class="rules-td-6">Seats per lobby</td><td class="rules-td-7">4</td><td class="rules-td-4">Matched, never auto-filled mid-round</td></tr>
+<tr><td class="rules-td-5">03</td><td class="rules-td-6">Ranked modes</td><td class="rules-td-7">0</td><td class="rules-td-4">The leaderboard counts nights, not wins</td></tr>
+<tr><td class="rules-td-5">04</td><td class="rules-td-6">Voice required</td><td class="rules-td-7">No</td><td class="rules-td-4">Text channels carry the room</td></tr>
+</tbody>
+</table>
+<p class="rules-p">Rules hold for the current printing. Changes are posted in Discord before they take effect.</p>
+</div>
+</section>
+<!-- games -->
+<section class="site-section-3" id="games">
+<span class="rules-span">02 · Tonight's tables</span>
+<hr class="games-hr"/>
+<div class="games-div">
+<div class="games-div-2">
+<h2 class="games-h2">Four seats, no pressure</h2>
+<p class="games-p">Pick a table, take a seat, play until you are tired. Farming, mining, cooking, tile-laying — nothing that punishes a bad night or asks you to keep up. Leave mid-round and it costs you nothing.</p>
+<div class="games-div-3">
+<div class="games-div-4"><span>Seats open now</span><span class="games-span">23</span></div>
+<div class="games-div-4"><span>On the waitlist</span><span class="games-span">1,204</span></div>
+<div class="games-div-5"><span>In Discord</span><span class="games-span">861</span></div>
+</div>
+</div>
+<div class="games-div-6">
+<div class="blueprint">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div class="games-div-7">Screenshot</div>
+<div class="games-div-8"><span class="games-span-2">Stardew Valley</span></div>
+</div>
+<div class="blueprint">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div class="games-div-7">Screenshot</div>
+<div class="games-div-8"><span class="games-span-2">Deep Rock</span></div>
+</div>
+<div class="blueprint">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div class="games-div-7">Screenshot</div>
+<div class="games-div-8"><span class="games-span-2">Overcooked 2</span></div>
+</div>
+<div class="blueprint">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div class="games-div-7">Screenshot</div>
+<div class="games-div-8"><span class="games-span-2">Dorfromantik</span></div>
+</div>
+</div>
+</div>
+</section>
+<!-- leaderboard -->
+<section class="site-section-3" id="board">
+<span class="rules-span">03 · The board</span>
+<hr class="games-hr"/>
+<div class="board-div">
+<h2 class="board-h2">It counts nights, not wins</h2>
+<span class="board-span">Updated 06:00 daily</span>
+</div>
+<div>
+<div class="board-div-2" id="board-first"><span class="board-span-2">01</span><span class="board-span-3">quietfern</span><span class="board-span-4">Stardew, mostly</span><span class="board-span-5">142</span></div>
+<div class="board-div-2"><span class="board-span-2">02</span><span class="board-span-3">mothlamp</span><span class="board-span-4">Deep Rock, 22:00</span><span class="board-span-5">128</span></div>
+<div class="board-div-2"><span class="board-span-2">03</span><span class="board-span-3">rustpine</span><span class="board-span-4">Never uses voice</span><span class="board-span-5">119</span></div>
+<div class="board-div-2"><span class="board-span-2">04</span><span class="board-span-3">slowlane</span><span class="board-span-4">Dorfromantik</span><span class="board-span-5">101</span></div>
+<div class="board-div-3"><span class="board-span-2">05</span><span class="board-span-3">tinroof</span><span class="board-span-4">Overcooked, badly</span><span class="board-span-5">94</span></div>
+</div>
+</section>
+<!-- waitlist -->
+<section class="site-section-3" id="waitlist">
+<span class="rules-span">04 · The waitlist</span>
+<hr class="games-hr"/>
+<h2 class="waitlist-h2">Seats open in batches</h2>
+<p class="waitlist-p">We add people a few dozen at a time so the lobbies stay small enough to recognise faces. Ask in Discord and we will tell you where you stand.</p>
+<div class="waitlist-div">
+<button class="waitlist-button" type="button" data-waitlist>Join the waitlist</button>
+<a class="waitlist-a" href="#discord" data-discord>Open Discord</a>
+</div>
+</section>
+</div>
+<!-- discord close -->
+<div class="site-div-2" id="discord">
+<div class="discord-div">
+<div>
+<h2 class="discord-h2">The room is already talking</h2>
+<p class="discord-p"><span id="member-count">861</span> members, mostly quiet, mostly after eight. Lobby calls, game suggestions, and the nightly roll call live in Discord.</p>
+</div>
+<a class="site-a-3" href="#discord" data-discord>Open Discord</a>
+</div>
+</div>
+<footer class="site-footer">
+<span>Logout Lounge — an after-hours games club.</span>
+<span>Doors 20:00 — 01:00 · No ranked modes</span>
 </footer>
+</div>
 
-<div class="gate" id="gate" hidden>
-  <div class="gate-box" role="dialog" aria-modal="true" aria-labelledby="gate-title">
-    <button class="gate-x" id="gate-close" aria-label="Close">&times;</button>
-    <p class="eyebrow">One quick check</p>
-    <h3 id="gate-title">Are you a person?</h3>
-    <p class="gate-copy">The invite isn't printed on this page — it's handed over after this check, so scrapers have nothing to find.</p>
+
+<div class="ll-modal" id="gate" hidden>
+  <div class="ll-panel" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+    <button class="ll-close" data-close aria-label="Close">&times;</button>
+    <span class="ll-kicker" id="gate-seats">Checking seats</span>
+    <h3 class="ll-title" id="gate-title">One quick check</h3>
+    <p class="ll-copy">The invite is not printed on this page. It is handed over after this check, so it cannot be scraped or passed around.</p>
     <div id="gate-widget"></div>
-    <p class="gate-status" id="gate-status">Waiting for the check&hellip;</p>
-    <a class="btn" id="gate-go" hidden target="_blank" rel="noopener">Open Discord</a>
+    <p class="ll-status" id="gate-status">Waiting for the check&hellip;</p>
+    <a class="ll-go" id="gate-go" hidden target="_blank" rel="noopener">Open Discord</a>
+  </div>
+</div>
+
+<div class="ll-modal" id="wait" hidden>
+  <div class="ll-panel" role="dialog" aria-modal="true" aria-labelledby="wait-title">
+    <button class="ll-close" data-close aria-label="Close">&times;</button>
+    <span class="ll-kicker" id="wait-kicker">The waitlist</span>
+    <h3 class="ll-title" id="wait-title">Leave your handle</h3>
+    <p class="ll-copy">We open a new batch when seats free up. You will get a friend request on Discord when yours does.</p>
+
+    <form id="wait-form" novalidate>
+      <label class="ll-label" for="w-name">Your name</label>
+      <input class="ll-input" id="w-name" type="text" placeholder="Rishi" autocomplete="nickname">
+
+      <label class="ll-label" for="w-discord">Discord username</label>
+      <input class="ll-input" id="w-discord" type="text" placeholder="rishi_" autocomplete="off">
+
+      <label class="ll-label" for="w-main">What you would play most</label>
+      <select class="ll-input" id="w-main">
+        <option>Stardew Valley</option>
+        <option>Overcooked 2</option>
+        <option>Deep Rock Galactic</option>
+        <option>Dorfromantik</option>
+        <option>PowerWash Simulator</option>
+        <option>Whatever is on</option>
+      </select>
+
+      <div class="ll-trap" aria-hidden="true">
+        <label for="w-site">Leave this empty</label>
+        <input id="w-site" name="website" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div id="wait-widget"></div>
+      <p class="ll-status" id="wait-status"></p>
+      <button class="ll-go" type="submit" id="wait-submit">Join the waitlist</button>
+    </form>
   </div>
 </div>
 
