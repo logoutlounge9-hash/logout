@@ -1,345 +1,166 @@
-/* ============================================================
-   0. FILL THIS IN
-   GUILD_ID — Server Settings > Widget > Enable, then copy Server ID
-   ============================================================ */
-const CONFIG = {
-  GUILD_ID: "000000000000000000"
-};
 
-/* ============================================================
-   0b. INTAKE — batches of 20, waitlist for everyone after
-   open ......... flip to false when a batch fills up
-   invite ....... a Discord invite set to expire after CAP uses
-   formAction ... your Google Form's URL, ending /formResponse
-   fields ....... the entry.NNN ids from that form (see notes)
-   ============================================================ */
+
 const INTAKE = {
-  open:  true,
-  cap:   20,
-  turnstileSiteKey: "YOUR_TURNSTILE_SITE_KEY",   // Cloudflare > Turnstile
-  nextBatch: "Sunday",
-
-  // The /exec URL from deploying waitlist.gs as a Web App.
-  endpoint: "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec"
+  endpoint:         "https://script.google.com/macros/s/AKfycbwdlbX5vo8vT4L8mD8dWHsjjvsyfSCHyDzWhkG8axMZmbe6l9AGKMIph7uGw2VD93g4/exec",
+  turnstileSiteKey: "0x4AAAAAAEpgX4OwTHNen-tN"
 };
 
-/* ============================================================
-   1. THE ROUTINE — the only schedule you maintain.
-   Mon to Sun. Change it when the club's habits change, not
-   every week. The week grid rebuilds itself from it.
-   ============================================================ */
-const WEEK = [
-  { day:"Mon", slots:[] },
+const gate = document.getElementById("gate");
+const wait = document.getElementById("wait");
 
-  { day:"Tue", slots:[
-    { t:"20:00", mins:120, game:"Valorant",      type:"Scrim",  note:"Five-stack, comms on" },
-    { t:"22:00", mins:90,  game:"Open lobby",    type:"Casual", note:"Whoever's still awake" }
-  ]},
+let seatsLeft = null;      // null until the server tells us
+let cap = 20, waiting = 0, members = null, board = null;
+let tsReady = false;
+let gateWidget = null, waitWidget = null;
 
-  { day:"Wed", slots:[
-    { t:"21:00", mins:120, game:"Counter-Strike 2", type:"Ranked", note:"Premier queue, one map" }
-  ]},
+/* ---- what the server says ------------------------------------ */
 
-  { day:"Thu", slots:[
-    { t:"20:00", mins:120, game:"Valorant",      type:"Ranked", note:"Split by rank into two lobbies" },
-    { t:"22:30", mins:90,  game:"Rocket League", type:"Ranked", note:"2v2, rotating pairs" }
-  ]},
-
-  { day:"Fri", slots:[
-    { t:"21:00", mins:150, game:"Apex Legends",  type:"Trios",  note:"Squads reshuffle every three games" },
-    { t:"23:30", mins:90,  game:"Late lobby",    type:"Casual", note:"No plan, no comms required" }
-  ]},
-
-  { day:"Sat", slots:[
-    { t:"18:00", mins:180, game:"Club tournament", type:"Event", note:"Brackets go up Thursday" },
-    { t:"21:00", mins:120, game:"Party games",     type:"Party", note:"Among Us, Jackbox, whatever" }
-  ]},
-
-  { day:"Sun", slots:[
-    { t:"16:00", mins:120, game:"Chess",     type:"Arena",  note:"5+3 blitz, join at any point" },
-    { t:"20:00", mins:120, game:"Minecraft", type:"Casual", note:"Build night on the club server" }
-  ]}
-];
-
-/* ============================================================
-   2. EXCEPTIONS — the only thing you touch by hand, and only
-   when a day differs from the routine. Key is YYYY-MM-DD.
-   Past entries are ignored; delete them whenever you like.
-   ============================================================ */
-const OVERRIDES = {
-  // "2026-08-29": { reason:"Off for the long weekend", slots:[] },
-  // "2026-09-05": { slots:[{ t:"19:00", mins:240, game:"Charity marathon", type:"Event", note:"Stream starts at seven" }] }
-};
-
-/* ---- Schedule resolution: routine, unless an exception says otherwise ---- */
-const dayIdx = d => (d.getDay() + 6) % 7;                 // Mon = 0
-const isoDate = d => d.getFullYear() + "-" +
-  String(d.getMonth()+1).padStart(2,"0") + "-" +
-  String(d.getDate()).padStart(2,"0");
-
-function scheduleFor(date){
-  const ex = OVERRIDES[isoDate(date)];
-  return {
-    slots:  ex ? (ex.slots || []) : WEEK[dayIdx(date)].slots,
-    reason: ex ? ex.reason : null
-  };
-}
-
-
-const GAMES = [
-  { name:"Valorant",         cat:"comp",   mode:"5v5 tactical",  text:"Two lobbies split by rank. Tuesday scrims, Thursday ranked push." },
-  { name:"Counter-Strike 2", cat:"comp",   mode:"5v5 tactical",  text:"Wednesday only. Premier queue, one map, VOD review after if people want." },
-  { name:"Rocket League",    cat:"comp",   mode:"2v2 / 3v3",     text:"The most forgiving competitive night — nobody minds carrying a new player." },
-  { name:"Apex Legends",     cat:"comp",   mode:"Battle royale", text:"Friday trios. We rotate squads every three games so it doesn't clique up." },
-  { name:"Minecraft",        cat:"casual", mode:"Club server",   text:"Always up. Survival world, whitelist only, no resets since 2023." },
-  { name:"Chess",            cat:"casual", mode:"Blitz ladder",  text:"Sunday afternoons, 5+3 arena. Runs long, join at any point." },
-  { name:"Among Us",         cat:"party",  mode:"Up to 15",      text:"Saturday chaos slot. Zero skill required, maximum shouting." },
-  { name:"Jackbox",          cat:"party",  mode:"Up to 8",       text:"Whoever's hosting streams it. Ends when the jokes stop landing." }
-];
-
-const LADDER = [
-  { who:"Aarav",   tag:"@bunnyhop99",  main:"Valorant",      streak:"7 nights", pts:148 },
-  { who:"Meera",   tag:"@mrcl",        main:"Rocket League", streak:"5 nights", pts:131 },
-  { who:"Tenzin",  tag:"@tz_",         main:"CS2",           streak:"4 nights", pts:119 },
-  { who:"Priya",   tag:"@pri.exe",     main:"Apex Legends",  streak:"9 nights", pts:112 },
-  { who:"Dev",     tag:"@devnull",     main:"Minecraft",     streak:"2 nights", pts:97  },
-  { who:"Sana",    tag:"@sanachu",     main:"Chess",         streak:"3 nights", pts:88  }
-];
-
-/* ============================================================
-   3. CLOCK — the live line above the headline
-   ============================================================ */
-const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-
-function tick(){
-  const now = new Date();
-  document.getElementById("clock").textContent =
-    DAYS[now.getDay()].slice(0,3).toUpperCase() + " \u00b7 " +
-    String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
-}
-tick(); setInterval(tick, 1000);
-
-/* ============================================================
-   4. DISCORD WIDGET — real online count, no backend
-   Public, unauthenticated, CORS-friendly. Needs the widget
-   switched on in Server Settings > Widget, or this 403s.
-   ============================================================ */
-const onlineEl = document.getElementById("online");
-const vcEl     = document.getElementById("voice");
-
-async function pullDiscord(){
+async function refreshSeats(){
   try {
-    const r = await fetch(`https://discord.com/api/guilds/${CONFIG.GUILD_ID}/widget.json`);
-    if (!r.ok) throw new Error(r.status);
+    const r = await fetch(INTAKE.endpoint, { redirect: "follow" });
     const d = await r.json();
-
-    onlineEl.textContent = d.presence_count;
-
-    // Voice channels with someone actually in them
-    const busy = (d.channels || [])
-      .map(c => ({ name:c.name, n:(d.members||[]).filter(m => m.channel_id === c.id).length }))
-      .filter(c => c.n > 0);
-
-    vcEl.textContent = busy.length
-      ? " · " + busy.map(c => `${c.n} in ${c.name}`).join(", ")
-      : "";
+    if (!d || !d.ok) return;
+    seatsLeft = d.seatsLeft;
+    cap = d.cap ?? cap;
+    waiting = d.waiting ?? 0;
+    members = d.members ?? null;   // null when the bot isn't set up yet
+    board   = d.board ?? null;
+    paint();
   } catch {
-    // Widget off or Discord unreachable — say nothing rather than lie.
-    onlineEl.closest(".clock").style.display = "none";
+    // Unreachable: leave the buttons alone rather than lying about seats.
   }
 }
-pullDiscord(); setInterval(pullDiscord, 60000);
 
-/* ============================================================
-   4b. GAMES + FILTER
-   ============================================================ */
-document.getElementById("games-grid").innerHTML = GAMES.map(g => `
-  <article class="game" data-cat="${g.cat}">
-    <p class="meta">${g.mode}</p>
-    <h3>${g.name}</h3>
-    <p>${g.text}</p>
-  </article>`).join("");
+function paint(){
+  if (seatsLeft === null) return;
+  const full = seatsLeft <= 0;
 
-document.querySelectorAll(".chip").forEach(chip => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c === chip));
-    const f = chip.dataset.filter;
-    document.querySelectorAll(".game").forEach(card => {
-      card.hidden = f !== "all" && card.dataset.cat !== f;
-    });
+  document.querySelectorAll("[data-discord]").forEach(el => {
+    el.textContent = full ? "Join the waitlist" : "Open Discord";
   });
-});
 
-/* ============================================================
-   5. WEEK GRID — this calendar week, exceptions included
-   ============================================================ */
-const monday = new Date();
-monday.setHours(0,0,0,0);
-monday.setDate(monday.getDate() - dayIdx(monday));
-const todayKey = isoDate(new Date());
+  document.getElementById("gate-seats").textContent =
+    full ? "No seats left" : `${seatsLeft} of ${cap} seats left`;
 
-document.getElementById("week-grid").innerHTML = WEEK.map((d,i) => {
-  const date = new Date(monday);
-  date.setDate(monday.getDate() + i);
-  const { slots, reason } = scheduleFor(date);
-  const isToday = isoDate(date) === todayKey;
+  document.getElementById("wait-kicker").textContent =
+    waiting ? `${waiting} on the waitlist` : "The waitlist";
 
-  return `
-    <div class="day${isToday ? " today" : ""}">
-      <div class="day-h">${d.day} ${date.getDate()}${isToday ? " · today" : ""}</div>
-      ${slots.length
-        ? slots.map(s => `<div class="slot"><b>${s.t}</b><span>${s.game}</span></div>`).join("")
-        : `<div class="rest">${reason || "Rest night"}</div>`}
-    </div>`;
-}).join("");
+  // Live from Discord via the bot. Left at the written-in number if the
+  // bot isn't answering — a stale count beats a blank or a zero.
+  const mc = document.getElementById("member-count");
+  if (mc && members) mc.textContent = members.toLocaleString();
 
-/* ============================================================
-   6. LADDER
-   ============================================================ */
-document.getElementById("ladder-body").innerHTML = LADDER.map((m,i) => `
-  <tr>
-    <td class="num">${String(i+1).padStart(2,"0")}</td>
-    <td class="who">${m.who}<small>${m.tag}</small></td>
-    <td>${m.main}</td>
-    <td class="streak-col"><span class="streak">${m.streak}</span></td>
-    <td class="pts">${m.pts}</td>
-  </tr>`).join("");
-
-/* ============================================================
-   7. INTAKE STATE — routes the buttons, rewrites the copy
-   ============================================================ */
-const ctaNav  = document.getElementById("cta-nav");
-const ctaHero = document.getElementById("cta-hero");
-const ctaNote = document.getElementById("cta-note");
-
-function applyIntake(){
-  if (INTAKE.open){
-    [ctaNav, ctaHero].forEach(a => {
-      a.href = "#";
-      a.removeAttribute("target");
-      a.removeAttribute("rel");
-      a.textContent = "Join the club";
-      a.addEventListener("click", e => { e.preventDefault(); openGate(); });
-    });
-    ctaNote.innerHTML =
-      `We let ${INTAKE.cap} people in at a time. ` +
-      `<a href="#join">Invite full? Join the waitlist.</a>`;
-
-    document.getElementById("join-title").innerHTML = "Takes about<br>forty seconds";
-    document.getElementById("join-lede").textContent =
-      `The invite above is capped at ${INTAKE.cap} so nobody walks into chaos. ` +
-      `If it's already used up, leave your details here and you'll be first into the next batch.`;
-    document.getElementById("join-submit").textContent = "Join the waitlist";
-
-  } else {
-    [ctaNav, ctaHero].forEach(a => {
-      a.href = "#join";
-      a.removeAttribute("target");
-      a.removeAttribute("rel");
-      a.textContent = "Join the waitlist";
-    });
-    ctaNote.textContent = `This batch is full. Next one opens ${INTAKE.nextBatch}.`;
-
-    document.getElementById("join-title").innerHTML = "The batch<br>is full";
-    document.getElementById("join-lede").textContent =
-      `All ${INTAKE.cap} spots are taken. Leave your details and you'll get the invite ` +
-      `when the next batch opens ${INTAKE.nextBatch.toLowerCase()}.`;
-    document.getElementById("join-submit").textContent = "Join the waitlist";
-  }
+  setNum("stat-waitlist", waiting);
+  paintBoard();
 }
-applyIntake();
 
-/* ============================================================
-   7. JOIN FORM
-   Front-end only. To actually receive these, point it at a form
-   service (Formspree, Getform) or your own endpoint — see notes.
-   ============================================================ */
-const form = document.getElementById("join-form");
-form.addEventListener("submit", e => {
-  e.preventDefault();
-  let ok = true;
+/* Sheet data is typed by hand, so it goes in as text, never as HTML. */
+function setText(id, value){
+  const el = document.getElementById(id);
+  if (el && value !== null && value !== undefined && value !== "") el.textContent = value;
+}
+function setNum(id, n){
+  if (typeof n === "number") setText(id, n.toLocaleString());
+}
 
-  [["name","f-name"],["discord","f-discord"]].forEach(([id, wrap]) => {
-    const bad = !document.getElementById(id).value.trim();
-    document.getElementById(wrap).classList.toggle("bad", bad);
-    if (bad) ok = false;
+function paintBoard(){
+  if (!board || !board.length) return;   // no data: leave the written-in rows
+
+  const first = document.getElementById("board-first");
+  if (!first) return;
+  const wrap = first.parentNode;
+
+  wrap.textContent = "";
+  board.forEach((r, i) => {
+    const row = document.createElement("div");
+    row.className = "board-div-2";
+    if (i === 0) row.id = "board-first";
+    [["board-span-2", String(i + 1).padStart(2, "0")],
+     ["board-span-3", r.handle],
+     ["board-span-4", r.note],
+     ["board-span-5", String(r.nights)]].forEach(([cls, text]) => {
+      const sp = document.createElement("span");
+      sp.className = cls;
+      sp.textContent = text;      // textContent, so a handle can never inject markup
+      row.appendChild(sp);
+    });
+    wrap.appendChild(row);
   });
-  if (!ok){ form.querySelector(".bad input").focus(); return; }
 
-  const data = {
-    name:    document.getElementById("name").value.trim(),
-    discord: document.getElementById("discord").value.trim(),
-    main:    document.getElementById("main").value,
-    nights:  [...document.querySelectorAll("input[name=nights]:checked")].map(n => n.value)
-  };
-  /* text/plain keeps this a "simple" request, so the browser skips the CORS
-     preflight that Apps Script can't answer. The reply carries their queue
-     position, which we drop into the confirmation once it lands. */
-  fetch(INTAKE.endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(data),
-    redirect: "follow"
-  })
-    .then(r => r.json())
-    .then(res => {
-      if (!res || !res.ok || !res.position) return;
-      document.getElementById("ok-position").textContent = res.duplicate
-        ? ` You were already on it, at number ${res.position}.`
-        : ` You're number ${res.position} in the queue.`;
-    })
-    .catch(err => console.error("Waitlist POST failed:", err));
+  // The headline stat is row one of the same board, so the two cannot disagree.
+  setNum("stat-nights", board[0].nights);
+  setText("stat-top", board[0].handle);
+}
 
-  form.classList.add("sent");
-  document.getElementById("join-ok").classList.add("show");
+/* ---- dialogs -------------------------------------------------- */
+
+function open_(el){
+  el.hidden = false;
+  el.querySelector("[data-close]").focus();
+}
+function close_(el){ el.hidden = true; }
+
+function status(id, msg, bad){
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.toggle("bad", !!bad);
+}
+
+document.querySelectorAll("[data-close]").forEach(b =>
+  b.addEventListener("click", () => close_(b.closest(".ll-modal"))));
+
+document.querySelectorAll(".ll-modal").forEach(m =>
+  m.addEventListener("click", e => { if (e.target === m) close_(m); }));
+
+addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  [gate, wait].forEach(m => { if (!m.hidden) close_(m); });
 });
 
+/* ---- Turnstile ------------------------------------------------ */
 
-/* ============================================================
-   8. VERIFICATION GATE
-   The invite never appears in this file or in the HTML. The page
-   asks Cloudflare for a token, the Apps Script asks Cloudflare
-   whether that token is real, and only then does it reply with
-   the link. A scraper reading the source finds nothing.
-   ============================================================ */
-const gate       = document.getElementById("gate");
-const gateStatus = document.getElementById("gate-status");
-const gateGo     = document.getElementById("gate-go");
-let   widgetId   = null;
-let   tsReady    = false;
+window.onTurnstileReady = () => {
+  tsReady = true;
+  if (!gate.hidden) mountGate();
+  if (!wait.hidden) mountWait();
+};
 
-window.onTurnstileReady = () => { tsReady = true; if (!gate.hidden) mountWidget(); };
-
-function mountWidget(){
-  if (!tsReady || widgetId !== null) return;
-  widgetId = turnstile.render("#gate-widget", {
+function mountGate(){
+  if (!tsReady || gateWidget !== null) return;
+  gateWidget = turnstile.render("#gate-widget", {
     sitekey: INTAKE.turnstileSiteKey,
     theme: "dark",
-    callback: fetchInvite,
-    "error-callback":   () => setStatus("That check didn't go through. Try again.", true),
-    "expired-callback": () => { turnstile.reset(widgetId); setStatus("Check expired — here's a fresh one."); }
+    action: "invite",
+    callback: claimSeat,
+    "error-callback":   () => status("gate-status", "That check did not go through. Try again.", true),
+    "expired-callback": () => { turnstile.reset(gateWidget); status("gate-status", "Check expired — here is a fresh one."); }
   });
 }
 
-function openGate(){
-  gate.hidden = false;
-  gateGo.hidden = true;
-  setStatus("Waiting for the check\u2026");
-  if (widgetId !== null) turnstile.reset(widgetId); else mountWidget();
-  document.getElementById("gate-close").focus();
+function mountWait(){
+  if (!tsReady || waitWidget !== null) return;
+  waitWidget = turnstile.render("#wait-widget", {
+    sitekey: INTAKE.turnstileSiteKey,
+    theme: "dark",
+    action: "waitlist"
+  });
 }
 
-function closeGate(){
-  gate.hidden = true;
-}
+/* ---- opening Discord ------------------------------------------ */
 
-function setStatus(msg, bad){
-  gateStatus.textContent = msg;
-  gateStatus.classList.toggle("bad", !!bad);
-}
+document.querySelectorAll("[data-discord]").forEach(el => {
+  el.addEventListener("click", e => {
+    e.preventDefault();
+    if (seatsLeft !== null && seatsLeft <= 0){ openWaitlist(); return; }
+    document.getElementById("gate-go").hidden = true;
+    status("gate-status", "Waiting for the check\u2026");
+    open_(gate);
+    if (gateWidget !== null) turnstile.reset(gateWidget); else mountGate();
+  });
+});
 
-async function fetchInvite(token){
-  setStatus("Checking\u2026");
+async function claimSeat(token){
+  status("gate-status", "Checking\u2026");
   try {
     const r = await fetch(INTAKE.endpoint, {
       method: "POST",
@@ -347,24 +168,110 @@ async function fetchInvite(token){
       body: JSON.stringify({ action: "invite", token }),
       redirect: "follow"
     });
-    const res = await r.json();
+    const d = await r.json();
 
-    if (res && res.ok && res.invite){
-      gateGo.href = res.invite;
-      gateGo.hidden = false;
-      setStatus("You're through. See you in there.");
-      /* Deliberately not auto-opening: a window.open after an await has lost
-         the user's click, so browsers block it. The button keeps the gesture. */
-    } else {
-      setStatus((res && res.error) || "Couldn't verify that. Try again.", true);
-      turnstile.reset(widgetId);
+    if (d && d.ok && d.full){
+      seatsLeft = 0; paint();
+      close_(gate);
+      openWaitlist();
+      status("wait-status", "The last seat went while you were on the page. You are first in line for the next batch.");
+      return;
     }
-  } catch (err){
-    setStatus("Couldn't reach the server. Check your connection and retry.", true);
-    turnstile.reset(widgetId);
+
+    if (d && d.ok && d.invite){
+      seatsLeft = d.seatsLeft; paint();
+      const go = document.getElementById("gate-go");
+      go.href = d.invite;
+      go.hidden = false;
+      status("gate-status", `Seat ${d.seat} of ${cap} is yours. ${d.seatsLeft} left after you.`);
+      /* Not auto-opening: a window.open after an await has lost the click,
+         so browsers block it. The button keeps the gesture. */
+      return;
+    }
+
+    status("gate-status", (d && d.error) || "Could not verify that. Try again.", true);
+    turnstile.reset(gateWidget);
+
+  } catch {
+    status("gate-status", "Could not reach the server. Check your connection and retry.", true);
+    turnstile.reset(gateWidget);
   }
 }
 
-document.getElementById("gate-close").addEventListener("click", closeGate);
-gate.addEventListener("click", e => { if (e.target === gate) closeGate(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && !gate.hidden) closeGate(); });
+/* ---- the waitlist --------------------------------------------- */
+
+let waitOpenedAt = 0;
+
+function openWaitlist(){
+  waitOpenedAt = Date.now();
+  const form = document.getElementById("wait-form");
+  form.classList.remove("sent");
+  status("wait-status", "");
+  open_(wait);
+  if (waitWidget !== null) turnstile.reset(waitWidget); else mountWait();
+}
+
+document.querySelectorAll("[data-waitlist]").forEach(el => {
+  el.addEventListener("click", e => { e.preventDefault(); openWaitlist(); });
+});
+
+document.getElementById("wait-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name = document.getElementById("w-name");
+  const disc = document.getElementById("w-discord");
+
+  let bad = false;
+  [name, disc].forEach(f => {
+    const empty = !f.value.trim();
+    f.classList.toggle("bad", empty);
+    if (empty) bad = true;
+  });
+  if (bad){
+    status("wait-status", "Add your name and Discord handle so we know who to add.", true);
+    name.value.trim() ? disc.focus() : name.focus();
+    return;
+  }
+
+  const token = waitWidget !== null ? turnstile.getResponse(waitWidget) : "";
+  if (!token){
+    status("wait-status", "Finish the check just above, then send.", true);
+    return;
+  }
+
+  const btn = document.getElementById("wait-submit");
+  btn.disabled = true;
+  status("wait-status", "Sending\u2026");
+
+  try {
+    const r = await fetch(INTAKE.endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "waitlist", token,
+        name: name.value.trim(),
+        discord: disc.value.trim(),
+        main: document.getElementById("w-main").value,
+        hp: document.getElementById("w-site").value,   // honeypot, must stay empty
+        dt: Date.now() - waitOpenedAt                  // humans take longer than 1.5s
+      }),
+      redirect: "follow"
+    });
+    const d = await r.json();
+
+    if (d && d.ok){
+      document.getElementById("wait-form").classList.add("sent");
+      status("wait-status", d.duplicate
+        ? `You were already on the list, at number ${d.position}.`
+        : `You are number ${d.position}. Watch for a friend request on Discord.`);
+      return;
+    }
+    status("wait-status", (d && d.error) || "That did not send. Try again.", true);
+  } catch {
+    status("wait-status", "Could not reach the server. Try again in a moment.", true);
+  } finally {
+    btn.disabled = false;
+    if (waitWidget !== null) turnstile.reset(waitWidget);
+  }
+});
+
+refreshSeats();
