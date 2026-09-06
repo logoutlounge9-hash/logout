@@ -1,8 +1,6 @@
 
 const API = 'https://discord.com/api/v10';
 
-// Only these are reachable. Everything else is refused, so a leaked relay
-// URL can't be turned into general access to your server.
 const ALLOWED = {
   guild:    () => `/guilds/${process.env.DISCORD_GUILD_ID}?with_counts=true`,
   invites:  () => `/guilds/${process.env.DISCORD_GUILD_ID}/invites`,
@@ -16,8 +14,15 @@ const ALLOWED = {
 };
 
 export default async function handler(req, res) {
-  // Not for browsers. Only the sheet knows the secret.
-  if (req.query.secret !== process.env.RELAY_SECRET) {
+  const expected = process.env.RELAY_SECRET;
+
+  if (!expected || expected.length < 12) {
+    console.error('RELAY_SECRET missing or too short — refusing all requests.');
+    return res.status(503).json({ error: 'relay not configured' });
+  }
+
+  const given = req.headers['x-relay-secret'] || req.query.secret;
+  if (given !== expected) {
     return res.status(401).json({ error: 'bad secret' });
   }
 
