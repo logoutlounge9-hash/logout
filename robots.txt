@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# The relay is not for crawlers.
+Disallow: /api/
+
+Sitemap: https://www.logoutlounge.club/sitemap.xml
