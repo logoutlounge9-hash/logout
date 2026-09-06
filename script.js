@@ -1,8 +1,6 @@
-
-
 const INTAKE = {
-  endpoint:         "https://script.google.com/macros/s/AKfycbwdlbX5vo8vT4L8mD8dWHsjjvsyfSCHyDzWhkG8axMZmbe6l9AGKMIph7uGw2VD93g4/exec",
-  turnstileSiteKey: "0x4AAAAAAEpgX4OwTHNen-tN"
+  endpoint:         "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec",
+  turnstileSiteKey: "YOUR_TURNSTILE_SITE_KEY"
 };
 
 const gate = document.getElementById("gate");
@@ -10,6 +8,7 @@ const wait = document.getElementById("wait");
 
 let seatsLeft = null;      // null until the server tells us
 let cap = 20, waiting = 0, members = null, board = null;
+let boardTitle = null, boardCaption = null;
 let tsReady = false;
 let gateWidget = null, waitWidget = null;
 
@@ -25,6 +24,8 @@ async function refreshSeats(){
     waiting = d.waiting ?? 0;
     members = d.members ?? null;   // null when the bot isn't set up yet
     board   = d.board ?? null;
+    boardTitle   = d.boardTitle ?? null;
+    boardCaption = d.boardCaption ?? null;
     paint();
   } catch {
     // Unreachable: leave the buttons alone rather than lying about seats.
@@ -65,6 +66,10 @@ function setNum(id, n){
 
 function paintBoard(){
   if (!board || !board.length) return;   // no data: leave the written-in rows
+
+  // The heading names whatever is being ranked today.
+  setText("board-title", boardTitle);
+  setText("board-caption", boardCaption);
 
   const first = document.getElementById("board-first");
   if (!first) return;
