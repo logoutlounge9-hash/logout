@@ -84,7 +84,8 @@
   --color-accent-2: #728fab;
   --color-divider: color-mix(in srgb, #1d1f20 16%, transparent);
 
-  
+  /* Tonal ramps — generated in OKLCH on one shared lightness scale, so the
+     same step of any role matches the others in visual value. */
   --color-neutral-100: #f5f5f8;
   --color-neutral-200: #e7e7ea;
   --color-neutral-300: #d4d4d7;
@@ -130,7 +131,8 @@
   --radius-md: 4px;
   --radius-lg: 7px;
 
- 
+  /* Elevation — derived from the ground: soft ink-tinted shadows on a
+     light theme, a hairline edge + ambient darkness on a dark one. */
   --shadow-sm: 0 1px 2px color-mix(in srgb, #2b2b2d 14%, transparent);
   --shadow-md: 0 3px 10px color-mix(in srgb, #2b2b2d 16%, transparent);
   --shadow-lg: 0 12px 32px color-mix(in srgb, #2b2b2d 22%, transparent);
@@ -148,7 +150,10 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-headi
   border: 1px solid var(--color-divider);
   border-radius: 0;
 }
-
+/* The overlay image treatments (halftone, duotone) clip their overlay
+   (overflow:hidden); a blueprint wrapper draws its registration marks
+   outside the box, so when both classes share a wrapper the frame must
+   win. */
 .blueprint.halftone, .blueprint.plate, .blueprint.duotone { overflow: visible; }
 .blueprint > .corner {
   position: absolute; width: 11px; height: 11px;
@@ -350,7 +355,6 @@ textarea.input { min-height: 90px; resize: vertical; }
 .btn-ghost { border-color: transparent; }
 
 
-/* 3. THEME (Logout Lounge) ================================================= */
 
 :root {
   --color-bg: #1a1020;
@@ -389,7 +393,6 @@ a:hover { color: var(--color-accent-800); }
 .ll-flicker { animation: ll-flicker 7.5s steps(1, end) infinite; }
 
 
-/* 4. LAYOUT ================================================================ */
 
 .site-div{
   font-family:var(--font-body);
@@ -969,3 +972,83 @@ form.sent{display:none}
 /* Honeypot. Positioned away rather than display:none — some bots skip
    hidden inputs, and this one wants to be found. */
 .ll-trap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+
+/* 6. SMALL SCREENS =========================================================
+   The design export shipped no breakpoints, so everything below is new.
+   Three things actually broke rather than merely looked tight: the
+   leaderboard columns overlapped, the rules table forced the page wider
+   than the screen, and the nav wrapped into an awkward stack.
+   ========================================================================== */
+
+/* Nothing should ever be able to push the page sideways. */
+html, body { overflow-x: hidden; }
+img, svg, table { max-width: 100%; }
+
+@media (max-width: 720px) {
+
+  /* ---- NAV: brand on its own line, links in a scrollable strip ---- */
+  .site-nav { gap: 12px 16px; padding: 14px 20px; }
+  .site-span { font-size: 17px; }
+  .site-span-2 { display: none; }          /* the flex:1 spacer */
+  .site-a { font-size: 12px; letter-spacing: 0.06em; }
+  .site-a-2 { width: 100%; text-align: center; margin-top: 4px; }
+
+  /* ---- HERO ---- */
+  .site-div-3 { padding: 40px 20px 48px; }
+  .site-h1 { margin-left: 0; }             /* the -0.052em pull clipped the C */
+  .site-p { margin-top: 24px; font-size: 16px; line-height: 24px; }
+
+  /* ---- THE THREE COUNTS ---- */
+  .site-section { padding: 40px 0 32px; gap: 28px; grid-template-columns: 1fr; }
+  .site-span-6, .site-span-7 { font-size: 52px; }
+
+  /* ---- LEADERBOARD ----
+     Was 4 fixed columns; the name overflowed its track and printed on top
+     of the comment. Now rank + name + score on one row, comment beneath. */
+  .board-div-2 {
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    gap: 4px 10px;
+    align-items: baseline;
+    padding: 16px 0;
+  }
+  .board-span-2 { grid-column: 1; grid-row: 1; }
+  .board-span-3 { grid-column: 2; grid-row: 1; font-size: 21px; }
+  .board-span-5 { grid-column: 3; grid-row: 1; font-size: 21px; }
+  .board-span-4 { grid-column: 2 / -1; grid-row: 2; font-size: 13px; }
+
+  .board-div { display: block; }
+  .board-h2 { max-width: none; }
+  .board-span { display: block; margin-top: 8px; }   /* the caption */
+
+  /* ---- HOUSE RULES ----
+     A four-column table cannot fit 320px, and one cell was nowrap. Each
+     row becomes a small stacked block instead. */
+  .rules-table, .rules-table tbody, .rules-table tr, .rules-table td {
+    display: block;
+    width: auto !important;
+  }
+  .rules-table tr {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--color-divider);
+  }
+  .rules-table tr:last-child { border-bottom: 0; }
+  .rules-table td { padding: 0 !important; }
+  .rules-table td:nth-child(1) { margin-bottom: 2px; }              /* 01 */
+  .rules-table td:nth-child(3) { white-space: normal; margin: 2px 0; }
+  .rules-table td:nth-child(4) { font-size: 13px; opacity: .85; }
+
+  .rules-div { padding: 12px 16px; }
+  .rules-span-2 { padding: 4px 0; min-width: 0; }
+  .rules-p { padding: 12px 16px; }
+
+  /* ---- GAMES ---- */
+  .games-div { gap: 20px; }
+  .games-h2 { margin-left: 0; }
+}
+
+@media (max-width: 400px) {
+  .site-h1 { font-size: 44px; }
+  .site-span-6, .site-span-7 { font-size: 44px; }
+  .board-span-3, .board-span-5 { font-size: 19px; }
+}
