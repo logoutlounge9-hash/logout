@@ -103,9 +103,22 @@ function paintBoard(){
     wrap.appendChild(row);
   });
 
-  // The headline stat is row one of the same board, so the two cannot disagree.
-  setNum("stat-nights", board[0].nights);
+  // Row one of the same board, so the two cannot disagree. The value is a
+  // preformatted string from the server — it might read "2", "4:47am" or
+  // "63 days" depending on the day's metric — so never treat it as a number.
+  setText("stat-nights", board[0].nights);
   setText("stat-top", board[0].handle);
+
+  // The caption has to follow the metric too, or on rotation days it reads
+  // "4:47am nights logged by ...".
+  const cap = document.getElementById("stat-nights-caption");
+  if (cap && boardCaption){
+    cap.textContent = "";
+    const who = document.createElement("span");
+    who.id = "stat-top";
+    who.textContent = board[0].handle;
+    cap.append(boardCaption.toLowerCase().replace(/^./, c => c) + " — ", who, " leads");
+  }
 }
 
 /* ---- dialogs -------------------------------------------------- */
