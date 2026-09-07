@@ -7,22 +7,10 @@
 <title>Logout Lounge - Log Off. Team Up. Game On.</title>
 <meta name="description" content="A community for people who work days and want a quiet night. Co-op and low-stakes games with strangers on the same schedule.">
 
-
+<!-- Canonical. Your apex 308-redirects to www, so www is the real address.
+     Without this, search engines can treat the two as duplicate pages. -->
 <link rel="canonical" href="https://www.logoutlounge.club/">
 <meta name="robots" content="index, follow">
-     
-<! Gtag & bing >
-     
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-D5K6C2X592"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-D5K6C2X592');
-</script>
-     
-<meta name="msvalidate.01" content="0220F7F6B994B6AB03AED5C8A60D6BCF" />
 
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.logoutlounge.club/">
@@ -42,12 +30,28 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 
 
-
 <link rel="stylesheet" href="style.css">
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileReady&render=explicit" async defer></script>
 </head>
-<body>
 
+
+     
+<! GA & bing >
+     
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-D5K6C2X592"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-D5K6C2X592');
+</script>
+     
+<meta name="msvalidate.01" content="0220F7F6B994B6AB03AED5C8A60D6BCF" />
+
+<! GA & Bing>
+
+<body>
 
 
 <div class="site-div">
@@ -101,7 +105,7 @@
 </div>
 <div>
 <span class="ll-flicker site-span-7" id="stat-nights">142</span>
-<p class="site-p-2">nights logged by <span id="stat-top">quietfern</span>, top of the board</p>
+<p class="site-p-2" id="stat-nights-caption">nights logged by <span id="stat-top">quietfern</span>, top of the board</p>
 </div>
 <div>
 <span class="ll-flicker site-span-8">0</span>
