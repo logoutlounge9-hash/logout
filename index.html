@@ -7,11 +7,21 @@
 <title>Logout Lounge - Log Off. Team Up. Game On.</title>
 <meta name="description" content="A community for people who work days and want a quiet night. Co-op and low-stakes games with strangers on the same schedule.">
 
-<!-- Canonical. Your apex 308-redirects to www, so www is the real address.
-     Without this, search engines can treat the two as duplicate pages. -->
+
 <link rel="canonical" href="https://www.logoutlounge.club/">
 <meta name="robots" content="index, follow">
+     
+// Gtag & bing
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-D5K6C2X592"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
+  gtag('config', 'G-D5K6C2X592');
+</script>
+     
+<meta name="msvalidate.01" content="0220F7F6B994B6AB03AED5C8A60D6BCF" />
 
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.logoutlounge.club/">
@@ -28,18 +38,9 @@
 <meta name="twitter:image" content="https://www.logoutlounge.club/og-image.png">
 
 <meta name="theme-color" content="#1a1020">
-<meta name="msvalidate.01" content="0220F7F6B994B6AB03AED5C8A60D6BCF" />
 <link rel="icon" href="/favicon.ico" sizes="any">
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-D5K6C2X592"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-D5K6C2X592');
-</script>
 
 <link rel="stylesheet" href="style.css">
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileReady&render=explicit" async defer></script>
@@ -54,11 +55,16 @@
 <nav class="site-nav">
 <span class="site-span">Logout Lounge</span>
 <span class="site-span-2"></span>
+<div class="nav-links" id="nav-links">
 <a class="site-a" href="#games">Games</a>
 <a class="site-a" href="#board">Leaderboard</a>
 <a class="site-a" href="#rules">House rules</a>
 <a class="site-a" href="#discord">Discord</a>
+</div>
 <a class="site-a-2" href="#waitlist" data-waitlist>Join the waitlist</a>
+<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">
+<span></span><span></span><span></span>
+</button>
 </nav>
 <div class="site-div-3">
 <span class="site-span-3">Lobbies open 20:00 — 01:00, every night</span>
