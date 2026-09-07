@@ -2,6 +2,7 @@ const INTAKE = {
   endpoint:         "https://script.google.com/macros/s/AKfycbwdlbX5vo8vT4L8mD8dWHsjjvsyfSCHyDzWhkG8axMZmbe6l9AGKMIph7uGw2VD93g4/exec",
   turnstileSiteKey: "0x4AAAAAAEpgX4OwTHNen-tN"
 };
+
 const gate = document.getElementById("gate");
 const wait = document.getElementById("wait");
 
@@ -70,27 +71,30 @@ function setNum(id, n){
   if (typeof n === "number") setText(id, n.toLocaleString());
 }
 
-function paintBoard(){
-  if (!board || !board.length) return;   // no data: leave the written-in rows
+const BOARD_ROWS = 5;   // the section always holds five, filled or not
 
-  // The heading names whatever is being ranked today.
-  setText("board-title", boardTitle);
-  setText("board-caption", boardCaption);
+function paintBoard(){
+  if (!board || !board.length) return;   // nothing yet: leave the written-in rows
 
   const first = document.getElementById("board-first");
   if (!first) return;
   const wrap = first.parentNode;
 
+  // Pad to a fixed five so the section keeps its shape on a small club.
+  const rows = board.slice(0, BOARD_ROWS);
+  while (rows.length < BOARD_ROWS) rows.push(null);
+
   wrap.textContent = "";
-  board.forEach((r, i) => {
+  rows.forEach((r, i) => {
     const row = document.createElement("div");
     // Last row carries the borderless variant, matching the static markup.
-    row.className = (i === board.length - 1) ? "board-div-3" : "board-div-2";
-    if (i === 0) row.id = "board-first";
+    row.className = (i === rows.length - 1) ? "board-div-3" : "board-div-2";
+    if (!r) row.classList.add("board-empty");
+
     [["board-span-2", String(i + 1).padStart(2, "0")],
-     ["board-span-3", r.handle],
-     ["board-span-4", r.note],
-     ["board-span-5", String(r.nights)]].forEach(([cls, text]) => {
+     ["board-span-3", r ? r.handle : "\u2014"],
+     ["board-span-4", r ? r.note   : "unclaimed"],
+     ["board-span-5", r ? String(r.nights) : "\u2014"]].forEach(([cls, text]) => {
       const sp = document.createElement("span");
       sp.className = cls;
       sp.textContent = text;      // textContent, so a handle can never inject markup
@@ -160,7 +164,9 @@ function mountGate(){
     action: "invite",
     callback: claimSeat,
     "error-callback": code => {
-      
+      // Cloudflare hands us a code. Showing it turns a vague failure into
+      // a diagnosis: 110200 = hostname not on the widget's list,
+      // 400020 = wrong sitekey, 300xxx = network or blocked script.
       console.error("Turnstile error", code);
       status("gate-status", "Check failed — Cloudflare code " + code + ". " + explainTs(code), true);
     },
@@ -219,7 +225,8 @@ async function claimSeat(token){
       go.href = d.invite;
       go.hidden = false;
       status("gate-status", `Seat ${d.seat} of ${cap} is yours. ${d.seatsLeft} left after you.`);
-      
+      /* Not auto-opening: a window.open after an await has lost the click,
+         so browsers block it. The button keeps the gesture. */
       return;
     }
 
@@ -285,8 +292,8 @@ document.getElementById("wait-form").addEventListener("submit", async e => {
         name: name.value.trim(),
         discord: disc.value.trim(),
         main: document.getElementById("w-main").value,
-        hp: document.getElementById("w-site").value,   
-        dt: Date.now() - waitOpenedAt                  
+        hp: document.getElementById("w-site").value,   // honeypot, must stay empty
+        dt: Date.now() - waitOpenedAt                  // humans take longer than 1.5s
       }),
       redirect: "follow"
     });
@@ -311,6 +318,9 @@ document.getElementById("wait-form").addEventListener("submit", async e => {
 refreshSeats();
 
 
+/* ============================================================
+   10. NAV MENU (small screens)
+   ============================================================ */
 const nav = document.querySelector(".site-nav");
 const burger = document.getElementById("nav-burger");
 
