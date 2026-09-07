@@ -1,6 +1,6 @@
 const INTAKE = {
   endpoint:         "https://script.google.com/macros/s/AKfycbwdlbX5vo8vT4L8mD8dWHsjjvsyfSCHyDzWhkG8axMZmbe6l9AGKMIph7uGw2VD93g4/exec",
-  turnstileSiteKey: "YOUR_TURNSTILE_SITE_KEY"
+  turnstileSiteKey: "0x4AAAAAAEpgX4OwTHNen-tN"
 };
 
 const gate = document.getElementById("gate");
