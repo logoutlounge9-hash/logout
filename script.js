@@ -84,7 +84,8 @@ function paintBoard(){
   wrap.textContent = "";
   board.forEach((r, i) => {
     const row = document.createElement("div");
-    row.className = "board-div-2";
+    // Last row carries the borderless variant, matching the static markup.
+    row.className = (i === board.length - 1) ? "board-div-3" : "board-div-2";
     if (i === 0) row.id = "board-first";
     [["board-span-2", String(i + 1).padStart(2, "0")],
      ["board-span-3", r.handle],
@@ -159,9 +160,7 @@ function mountGate(){
     action: "invite",
     callback: claimSeat,
     "error-callback": code => {
-      // Cloudflare hands us a code. Showing it turns a vague failure into
-      // a diagnosis: 110200 = hostname not on the widget's list,
-      // 400020 = wrong sitekey, 300xxx = network or blocked script.
+      
       console.error("Turnstile error", code);
       status("gate-status", "Check failed — Cloudflare code " + code + ". " + explainTs(code), true);
     },
@@ -220,8 +219,7 @@ async function claimSeat(token){
       go.href = d.invite;
       go.hidden = false;
       status("gate-status", `Seat ${d.seat} of ${cap} is yours. ${d.seatsLeft} left after you.`);
-      /* Not auto-opening: a window.open after an await has lost the click,
-         so browsers block it. The button keeps the gesture. */
+      
       return;
     }
 
@@ -287,8 +285,8 @@ document.getElementById("wait-form").addEventListener("submit", async e => {
         name: name.value.trim(),
         discord: disc.value.trim(),
         main: document.getElementById("w-main").value,
-        hp: document.getElementById("w-site").value,   // honeypot, must stay empty
-        dt: Date.now() - waitOpenedAt                  // humans take longer than 1.5s
+        hp: document.getElementById("w-site").value,   
+        dt: Date.now() - waitOpenedAt                  
       }),
       redirect: "follow"
     });
@@ -311,3 +309,29 @@ document.getElementById("wait-form").addEventListener("submit", async e => {
 });
 
 refreshSeats();
+
+
+const nav = document.querySelector(".site-nav");
+const burger = document.getElementById("nav-burger");
+
+function setNav(open){
+  nav.classList.toggle("open", open);
+  burger.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+burger.addEventListener("click", () => setNav(!nav.classList.contains("open")));
+
+// Jumping to a section should close the menu behind you.
+document.querySelectorAll("#nav-links a").forEach(a =>
+  a.addEventListener("click", () => setNav(false)));
+
+document.addEventListener("click", e => {
+  if (!nav.contains(e.target)) setNav(false);
+});
+
+addEventListener("keydown", e => {
+  if (e.key === "Escape" && nav.classList.contains("open")){
+    setNav(false);
+    burger.focus();
+  }
+});
