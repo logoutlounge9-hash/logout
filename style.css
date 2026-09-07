@@ -75,6 +75,38 @@
 }
 
 
+/* 2. TOKENS (design-system defaults) ======================================= */
+
+/* Industry — design-system tokens and component classes. This file is the source of truth for the system's look; retune it here and see readme.md. */
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
 
 
 
@@ -1143,3 +1175,7 @@ img, svg, table { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   .nav-burger span { transition: none; }
 }
+
+/* Unclaimed leaderboard places. Present, but clearly not a person. */
+.board-empty { opacity: .38; }
+.board-empty .board-span-3 { letter-spacing: .04em; }
