@@ -76,6 +76,8 @@
 
 
 
+
+
 :root {
   --color-bg: #f2f2f3;
   --color-surface: #e9e9ea;
@@ -173,6 +175,11 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-headi
 .duotone::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:var(--color-accent);mix-blend-mode:color}
 
+/* ══════════════════════════════════════════════════════════════════════════
+   Components — built with the tokens above. Plain CSS
+   on plain HTML: no JavaScript, no build step. Each class is documented in
+   readme.md and demonstrated in foundations/ and components/.
+   ══════════════════════════════════════════════════════════════════════ */
 
 *, *::before, *::after { box-sizing: border-box; }
 body { margin: 0; font-size: 15px; line-height: 1.55; font-weight: 400; }
@@ -355,6 +362,7 @@ textarea.input { min-height: 90px; resize: vertical; }
 .btn-ghost { border-color: transparent; }
 
 
+/* 3. THEME (Logout Lounge) ================================================= */
 
 :root {
   --color-bg: #1a1020;
@@ -393,6 +401,7 @@ a:hover { color: var(--color-accent-800); }
 .ll-flicker { animation: ll-flicker 7.5s steps(1, end) infinite; }
 
 
+/* 4. LAYOUT ================================================================ */
 
 .site-div{
   font-family:var(--font-body);
@@ -1006,13 +1015,15 @@ img, svg, table { max-width: 100%; }
   /* ---- LEADERBOARD ----
      Was 4 fixed columns; the name overflowed its track and printed on top
      of the comment. Now rank + name + score on one row, comment beneath. */
-  .board-div-2 {
+  .board-div-2,
+  .board-div-3 {
     grid-template-columns: 28px minmax(0, 1fr) auto;
     gap: 4px 10px;
     align-items: baseline;
     padding: 16px 0;
   }
   .board-span-2 { grid-column: 1; grid-row: 1; }
+  .board-div-3 .board-span-2 { grid-column: 1; grid-row: 1; }
   .board-span-3 { grid-column: 2; grid-row: 1; font-size: 21px; }
   .board-span-5 { grid-column: 3; grid-row: 1; font-size: 21px; }
   .board-span-4 { grid-column: 2 / -1; grid-row: 2; font-size: 13px; }
@@ -1042,6 +1053,23 @@ img, svg, table { max-width: 100%; }
   .rules-span-2 { padding: 4px 0; min-width: 0; }
   .rules-p { padding: 12px 16px; }
 
+  /* ---- FOOTER ----
+     space-between with two short lines leaves a gap the width of the
+     screen. Stacked reads as one block instead of two orphans. */
+  .site-footer {
+    display: block;
+    padding: 28px 20px 36px;
+    font-size: 12px;
+    line-height: 20px;
+  }
+  .site-footer span { display: block; }
+  .site-footer span + span {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-divider);
+    color: color-mix(in srgb, var(--color-text) 62%, transparent);
+  }
+
   /* ---- GAMES ---- */
   .games-div { gap: 20px; }
   .games-h2 { margin-left: 0; }
@@ -1051,4 +1079,67 @@ img, svg, table { max-width: 100%; }
   .site-h1 { font-size: 44px; }
   .site-span-6, .site-span-7 { font-size: 44px; }
   .board-span-3, .board-span-5 { font-size: 19px; }
+}
+
+
+/* 7. NAV MENU ==============================================================
+   The four links group into a panel below the bar on small screens. The
+   waitlist button stays put — it's the thing people came for, and hiding
+   a call to action behind a menu costs more than it saves.
+   ========================================================================== */
+
+.nav-links { display: contents; }   /* desktop: links sit in the nav's own flex row */
+
+.nav-burger {
+  display: none;
+  background: none;
+  border: 1px solid var(--color-divider);
+  padding: 9px 10px;
+  cursor: pointer;
+  line-height: 0;
+}
+.nav-burger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  margin: 3px 0;
+  background: var(--color-text);
+  transition: transform .2s ease, opacity .2s ease;
+}
+
+@media (max-width: 720px) {
+  .site-nav { position: relative; }
+  .nav-burger { display: block; order: 3; }
+  .site-a-2 { order: 2; width: auto; margin-top: 0; }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    flex-direction: column;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-divider);
+    border-bottom: 1px solid var(--color-divider);
+    padding: 6px 20px 14px;
+  }
+  .site-nav.open .nav-links { display: flex; }
+
+  .nav-links .site-a {
+    padding: 13px 0;
+    font-size: 14px;
+    border-bottom: 1px solid var(--color-divider);
+  }
+  .nav-links .site-a:last-child { border-bottom: 0; }
+
+  /* Bars fold into an X while the panel is open. */
+  .site-nav.open .nav-burger span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+  .site-nav.open .nav-burger span:nth-child(2) { opacity: 0; }
+  .site-nav.open .nav-burger span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-burger span { transition: none; }
 }
