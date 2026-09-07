@@ -2,7 +2,6 @@ const INTAKE = {
   endpoint:         "https://script.google.com/macros/s/AKfycbwdlbX5vo8vT4L8mD8dWHsjjvsyfSCHyDzWhkG8axMZmbe6l9AGKMIph7uGw2VD93g4/exec",
   turnstileSiteKey: "0x4AAAAAAEpgX4OwTHNen-tN"
 };
-
 const gate = document.getElementById("gate");
 const wait = document.getElementById("wait");
 
@@ -52,6 +51,13 @@ function paint(){
   if (mc && members) mc.textContent = members.toLocaleString();
 
   setNum("stat-waitlist", waiting);
+
+  // Tonight's tables repeats the same three figures, so it reads from the
+  // same variables — the two panels can never disagree.
+  setNum("stat-seats", seatsLeft);
+  setNum("stat-waitlist-2", waiting);
+  if (members) setNum("stat-members-2", members);
+
   paintBoard();
 }
 
@@ -130,14 +136,35 @@ window.onTurnstileReady = () => {
   if (!wait.hidden) mountWait();
 };
 
+/** Plain-English version of Cloudflare's error codes. */
+function explainTs(code){
+  const c = String(code || "");
+  if (c.indexOf("110200") === 0) return "This hostname is not on the widget's allowed list.";
+  if (c.indexOf("400020") === 0) return "The site key does not match this widget.";
+  if (c.indexOf("1020")   === 0) return "Cloudflare blocked the request.";
+  if (c.indexOf("300")    === 0 || c.indexOf("600") === 0)
+                                 return "The challenge could not load — network or blocker.";
+  return "Look this code up in Cloudflare's Turnstile docs.";
+}
+
 function mountGate(){
   if (!tsReady || gateWidget !== null) return;
+  if (!INTAKE.turnstileSiteKey || INTAKE.turnstileSiteKey.indexOf("YOUR_") === 0){
+    status("gate-status", "No Turnstile site key set in script.js.", true);
+    return;
+  }
   gateWidget = turnstile.render("#gate-widget", {
     sitekey: INTAKE.turnstileSiteKey,
     theme: "dark",
     action: "invite",
     callback: claimSeat,
-    "error-callback":   () => status("gate-status", "That check did not go through. Try again.", true),
+    "error-callback": code => {
+      // Cloudflare hands us a code. Showing it turns a vague failure into
+      // a diagnosis: 110200 = hostname not on the widget's list,
+      // 400020 = wrong sitekey, 300xxx = network or blocked script.
+      console.error("Turnstile error", code);
+      status("gate-status", "Check failed — Cloudflare code " + code + ". " + explainTs(code), true);
+    },
     "expired-callback": () => { turnstile.reset(gateWidget); status("gate-status", "Check expired — here is a fresh one."); }
   });
 }
@@ -147,7 +174,11 @@ function mountWait(){
   waitWidget = turnstile.render("#wait-widget", {
     sitekey: INTAKE.turnstileSiteKey,
     theme: "dark",
-    action: "waitlist"
+    action: "waitlist",
+    "error-callback": code => {
+      console.error("Turnstile error", code);
+      status("wait-status", "Check failed — Cloudflare code " + code + ". " + explainTs(code), true);
+    }
   });
 }
 
