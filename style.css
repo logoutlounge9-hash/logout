@@ -822,7 +822,7 @@ a:hover { color: var(--color-accent-800); }
 }
 .board-div-2{
   display:grid;
-  grid-template-columns:48px minmax(0,1fr) minmax(0,auto) 72px;
+  grid-template-columns:48px minmax(0,1fr) minmax(0,auto) minmax(72px,max-content);
   gap:16px;
   align-items:baseline;
   padding:14px 0;
@@ -850,7 +850,7 @@ a:hover { color: var(--color-accent-800); }
 }
 .board-div-3{
   display:grid;
-  grid-template-columns:48px minmax(0,1fr) minmax(0,auto) 72px;
+  grid-template-columns:48px minmax(0,1fr) minmax(0,auto) minmax(72px,max-content);
   gap:16px;
   align-items:baseline;
   padding:14px 0;
@@ -1179,3 +1179,9 @@ img, svg, table { max-width: 100%; }
 /* Unclaimed leaderboard places. Present, but clearly not a person. */
 .board-empty { opacity: .38; }
 .board-empty .board-span-3 { letter-spacing: .04em; }
+
+
+/* Board values can be "2", "9:52pm" or "63 days" depending on the day's
+   metric. Never let one break across lines. */
+.board-span-5 { white-space: nowrap; }
+.site-span-7  { white-space: nowrap; }   /* the headline stat */
