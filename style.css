@@ -1182,6 +1182,18 @@ img, svg, table { max-width: 100%; }
 
 
 /* Board values can be "2", "9:52pm" or "63 days" depending on the day's
-   metric. Never let one break across lines. */
-.board-span-5 { white-space: nowrap; }
-.site-span-7  { white-space: nowrap; }   /* the headline stat */
+   metric. Keep them on one line, and clip anything unexpectedly long rather
+   than letting it push the layout sideways. */
+.board-span-5 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12ch;
+}
+.site-span-7 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+}
