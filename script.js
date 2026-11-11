@@ -19,8 +19,8 @@ const ADS = {
  * isn't working" becomes a specific cause in the console.
  */
 function trackSignup(kind){
-  if (ADS.sendTo.indexOf("AW-18564403802") === 0){
-    console.warn("[ads] ADS.sendTo is still the placeholder in script.js — not sending.");
+    if (ADS.sendTo.indexOf("AW-18564403802") === 0 || ADS.sendTo.indexOf("/") < 0){
+    console.warn("[ads] ADS.sendTo is not a real conversion target — not sending.");
     return;
   }
   if (typeof gtag !== "function"){
