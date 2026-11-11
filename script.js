@@ -186,8 +186,9 @@ addEventListener("keydown", e => {
 
 /* ---- Turnstile ------------------------------------------------ */
 
-window.onTurnstileReady = () => {
+window.llTurnstileReady = () => {
   tsReady = true;
+  if (window.__tsEarly) window.llTurnstileReady();
   if (!gate.hidden) mountGate();
   if (!wait.hidden) mountWait();
 };
