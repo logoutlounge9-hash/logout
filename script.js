@@ -344,6 +344,7 @@ document.getElementById("wait-form").addEventListener("submit", async e => {
       status("wait-status", d.duplicate
         ? `You were already on the list, at number ${d.position}.`
         : `You are number ${d.position}. Watch for a friend request on Discord.`);
+            if (!d.duplicate && Number(d.position) > 0) trackSignup("new");
       return;
     }
     status("wait-status", (d && d.error) || "That did not send. Try again.", true);
