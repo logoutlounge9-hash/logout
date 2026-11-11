@@ -31,6 +31,13 @@
 
 
 <link rel="stylesheet" href="style.css">
+     <script>
+  window.__tsEarly = false;
+  window.onTurnstileReady = function(){
+    if (window.llTurnstileReady) window.llTurnstileReady();
+    else window.__tsEarly = true;
+  };
+</script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileReady&render=explicit" async defer></script>
 </head>
 
