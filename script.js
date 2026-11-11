@@ -14,19 +14,29 @@ const ADS = {
   currency: "INR"
 };
  
-/** Reports one conversion. Safe to call whether or not tags loaded. */
+/**
+ * Reports one conversion. Logs the reason when it cannot, so "the tag
+ * isn't working" becomes a specific cause in the console.
+ */
 function trackSignup(kind){
-  // gtag is absent until the Google tag loads; a blocker also removes it.
-  if (typeof gtag !== "function") return;
-  if (ADS.sendTo.indexOf("AW-18564403802") === 0) return;   // still the placeholder
- 
-  gtag("event", "conversion", {
+  if (ADS.sendTo.indexOf("AW-18564403802") === 0){
+    console.warn("[ads] ADS.sendTo is still the placeholder in script.js — not sending.");
+    return;
+  }
+  if (typeof gtag !== "function"){
+    console.warn("[ads] gtag() is not defined. Either the Google tag block in "
+      + "index.html is still commented out, or an ad blocker removed it.");
+    return;
+  }
+
+  const payload = {
     send_to: ADS.sendTo,
     value: ADS.value,
     currency: ADS.currency,
-    // Your own label, so repeat submissions can be told apart in reporting.
     transaction_id: kind === "duplicate" ? "" : "waitlist-" + Date.now()
-  });
+  };
+  gtag("event", "conversion", payload);
+  console.info("[ads] conversion sent", payload);
 }
 
 
