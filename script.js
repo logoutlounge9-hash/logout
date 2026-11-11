@@ -3,6 +3,33 @@ const INTAKE = {
   turnstileSiteKey: "0x4AAAAAAEpgX4OwTHNen-tN"
 };
 
+/* ============================================================
+   GOOGLE ADS CONVERSION
+ 
+   ============================================================ */
+
+const ADS = {
+  sendTo: "AW-18564403802/Hin-CMiU87QdENqkmZRF",
+  value: 1.0,            // what one waitlist signup is worth to you
+  currency: "INR"
+};
+ 
+/** Reports one conversion. Safe to call whether or not tags loaded. */
+function trackSignup(kind){
+  // gtag is absent until the Google tag loads; a blocker also removes it.
+  if (typeof gtag !== "function") return;
+  if (ADS.sendTo.indexOf("AW-18564403802") === 0) return;   // still the placeholder
+ 
+  gtag("event", "conversion", {
+    send_to: ADS.sendTo,
+    value: ADS.value,
+    currency: ADS.currency,
+    // Your own label, so repeat submissions can be told apart in reporting.
+    transaction_id: kind === "duplicate" ? "" : "waitlist-" + Date.now()
+  });
+}
+
+
 const gate = document.getElementById("gate");
 const wait = document.getElementById("wait");
 
