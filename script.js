@@ -9,7 +9,7 @@ const INTAKE = {
    ============================================================ */
 
 const ADS = {
-  sendTo: "AW-18564403802/Hin-CMiU87QdENqkmZRF",
+  sendTo: "AW-18564403802/13C4CMe4kLYdENqkmZRF",
   value: 1.0,            // what one waitlist signup is worth to you
   currency: "INR"
 };
