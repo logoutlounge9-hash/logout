@@ -19,11 +19,12 @@ const ADS = {
  * isn't working" becomes a specific cause in the console.
  */
 function trackSignup(kind){
-    if (ADS.sendTo.indexOf("AW-18564403802") === 0 || ADS.sendTo.indexOf("/") < 0){
-    console.warn("[ads] ADS.sendTo is not a real conversion target — not sending.");
+  if (!/^AW-\d+\/.+/.test(ADS.sendTo)){
+    console.warn("[ads] ADS.sendTo is not a valid conversion target:", ADS.sendTo);
     return;
   }
   if (typeof gtag !== "function"){
+
     console.warn("[ads] gtag() is not defined. Either the Google tag block in "
       + "index.html is still commented out, or an ad blocker removed it.");
     return;
